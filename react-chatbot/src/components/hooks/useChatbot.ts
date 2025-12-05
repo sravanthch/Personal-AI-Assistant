@@ -8,8 +8,9 @@ interface Message {
 
 export const useChatbot = () => {
     const [messages, setMessages] = useState<Message[]>([]);
+    const [pdfContent, setPdfContent] = useState<string | null>(null);
 
-    const sendMessage = async (message: string) => {
+    const sendMessage = async (message: string, includeContext: boolean = false) => {
         if (!message || !message.trim()) return;
 
         // Add the user's message using a functional update to avoid stale state
@@ -19,8 +20,14 @@ export const useChatbot = () => {
         // const apiKey = process.env.API_KEY
         const apiKey = import.meta.env.VITE_API_KEY;
         
-
         try {
+            let userContent = message;
+            
+            // If PDF is uploaded and context should be included, add it to the message
+            if (includeContext && pdfContent) {
+                userContent = `You are answering based on the following PDF document content:\n\n${pdfContent}\n\nQuestion: ${message}`;
+            }
+
             const response = await axios.post(
                 import.meta.env.VITE_OPEN_AI_API,
                 {
@@ -28,7 +35,7 @@ export const useChatbot = () => {
                     messages: [
                         {
                             role: "user",
-                            content: message,
+                            content: userContent,
                         },
                     ],
                 },
@@ -55,5 +62,13 @@ export const useChatbot = () => {
         }
     };
 
-    return { messages, sendMessage };
+    const setPDF = (content: string) => {
+        setPdfContent(content);
+    };
+
+    const clearPDF = () => {
+        setPdfContent(null);
+    };
+
+    return { messages, sendMessage, setPDF, clearPDF, hasPDF: !!pdfContent };
 };
