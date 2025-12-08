@@ -4,8 +4,8 @@ import ChatComponent from './components/ChatComponent';
 
 const App: React.FunctionComponent = () => {
   return (
-    <div className="max-w-lg mt-15 mx-auto bg-white shadow-md rounded-lg overflow-hidden">
-      <div className='w-full max-w-lg bg-white shadow-lg rounded-lg overflow-hidden'>
+    <div className="h-screen w-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+      <div className='w-full h-full max-w-7xl bg-white shadow-2xl rounded-xl overflow-hidden flex'>
         <ChatComponent/>
       </div>
     </div>
