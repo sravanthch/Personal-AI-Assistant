@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react'
-import { LuBot, LuSendHorizontal, LuUpload, LuX, LuFileText } from 'react-icons/lu';
+import { LuBot, LuSendHorizontal, LuUpload, LuX, LuFileText, LuMenu } from 'react-icons/lu';
 import { useChatbot } from './hooks/useChatbot';
 import Markdown from 'react-markdown';
 import { usePDFHandler } from './hooks/usePdfHandler';
@@ -11,6 +11,7 @@ interface IChatComponentProps {
 
 const ChatComponent: React.FunctionComponent<IChatComponentProps> = () => {
     const [input, setInput] = useState('')
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const { messages, sendMessage, setPDF, clearPDF, hasPDF } = useChatbot();
     const { pdfData, isLoading, error, uploadPDF, clearPDF: clearPDFHandler } = usePDFHandler();
     const ref = useChatScroll(messages)
@@ -74,12 +75,18 @@ const ChatComponent: React.FunctionComponent<IChatComponentProps> = () => {
 
     return (
         <>
-            <div className='w-80 bg-gradient-to-b from-gray-900 to-gray-800 text-white flex flex-col border-r border-gray-700'>
-                <div className='p-6 border-b border-gray-700'>
+            <div className={`fixed inset-0 z-50 w-full md:relative md:inset-auto md:w-80 bg-gradient-to-b from-gray-900 to-gray-800 text-white flex flex-col border-r border-gray-700 transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
+                <div className='p-6 border-b border-gray-700 flex items-center justify-between'>
                     <h2 className='text-2xl font-bold flex items-center gap-2'>
                         <LuFileText size={28} className='text-blue-400' />
                         Documents
                     </h2>
+                    <button
+                        onClick={() => setIsSidebarOpen(false)}
+                        className='md:hidden p-2 text-gray-400 hover:text-white rounded-lg hover:bg-gray-700 transition-colors'
+                    >
+                        <LuX size={24} />
+                    </button>
                 </div>
 
                 <div className='flex-1 flex flex-col p-6 gap-4'>
@@ -149,10 +156,18 @@ const ChatComponent: React.FunctionComponent<IChatComponentProps> = () => {
                 </div>
             </div>
 
-            <div className='flex-1 flex flex-col bg-white'>
-                <div className='p-4 font-semibold text-lg bg-gradient-to-r from-blue-600 to-blue-800 flex text-white justify-center items-center gap-2'>
-                    <LuBot size={25} />
-                    React + OpenAI Chatbot
+            <div className='flex-1 flex flex-col bg-white w-full'>
+                <div className='p-4 font-semibold text-lg bg-gradient-to-r from-blue-600 to-blue-800 flex text-white items-center gap-3'>
+                    <button
+                        onClick={() => setIsSidebarOpen(true)}
+                        className='md:hidden p-1 hover:bg-white/10 rounded-lg transition-colors'
+                    >
+                        <LuMenu size={24} />
+                    </button>
+                    <div className='flex items-center gap-2 justify-center flex-1 md:flex-none'>
+                        <LuBot size={25} />
+                        React + OpenAI Chatbot
+                    </div>
                 </div>
 
                 <div ref={ref} className='flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50'>
@@ -169,11 +184,10 @@ const ChatComponent: React.FunctionComponent<IChatComponentProps> = () => {
                             className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                         >
                             <div
-                                className={`max-w-md lg:max-w-xl px-4 py-3 rounded-lg ${
-                                    msg.sender === 'user'
+                                className={`max-w-md lg:max-w-xl px-4 py-3 rounded-lg ${msg.sender === 'user'
                                         ? 'bg-blue-600 text-white rounded-br-none'
                                         : 'bg-white text-gray-800 border border-gray-200 rounded-bl-none shadow-sm'
-                                }`}
+                                    }`}
                             >
                                 <div className='prose prose-sm max-w-none dark:prose-invert'>
                                     <Markdown>
@@ -201,7 +215,7 @@ const ChatComponent: React.FunctionComponent<IChatComponentProps> = () => {
                                 }
                             }}
                         />
-                        <button 
+                        <button
                             onClick={handleSend}
                             className='p-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition duration-200 flex items-center justify-center'
                             title='Send message'
