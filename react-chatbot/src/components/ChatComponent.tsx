@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react'
-import { LuBot, LuSendHorizontal, LuUpload, LuX, LuFileText, LuMenu } from 'react-icons/lu';
+import { LuBot, LuSendHorizontal, LuUpload, LuX, LuFileText, LuMenu, LuLoader } from 'react-icons/lu';
 import { useChatbot } from './hooks/useChatbot';
 import Markdown from 'react-markdown';
 import { usePDFHandler } from './hooks/usePdfHandler';
@@ -12,7 +12,7 @@ interface IChatComponentProps {
 const ChatComponent: React.FunctionComponent<IChatComponentProps> = () => {
     const [input, setInput] = useState('')
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const { messages, sendMessage, setPDF, clearPDF, hasPDF } = useChatbot();
+    const { messages, sendMessage, setPDF, clearPDF, hasPDF, isSending } = useChatbot();
     const { pdfData, isLoading, error, uploadPDF, clearPDF: clearPDFHandler } = usePDFHandler();
     const ref = useChatScroll(messages)
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -164,7 +164,7 @@ const ChatComponent: React.FunctionComponent<IChatComponentProps> = () => {
                     >
                         <LuMenu size={24} />
                     </button>
-                    <div className='flex items-center gap-2 justify-center flex-1 md:flex-none'>
+                    <div className='flex items-center gap-2 justify-center flex-1'>
                         <LuBot size={25} />
                         React + OpenAI Chatbot
                     </div>
@@ -185,8 +185,8 @@ const ChatComponent: React.FunctionComponent<IChatComponentProps> = () => {
                         >
                             <div
                                 className={`max-w-md lg:max-w-xl px-4 py-3 rounded-lg ${msg.sender === 'user'
-                                        ? 'bg-blue-600 text-white rounded-br-none'
-                                        : 'bg-white text-gray-800 border border-gray-200 rounded-bl-none shadow-sm'
+                                    ? 'bg-blue-600 text-white rounded-br-none'
+                                    : 'bg-white text-gray-800 border border-gray-200 rounded-bl-none shadow-sm'
                                     }`}
                             >
                                 <div className='prose prose-sm max-w-none dark:prose-invert'>
@@ -197,6 +197,14 @@ const ChatComponent: React.FunctionComponent<IChatComponentProps> = () => {
                             </div>
                         </div>
                     ))}
+                    {isSending && (
+                        <div className='flex justify-start'>
+                            <div className='bg-white text-gray-800 border border-gray-200 rounded-lg rounded-bl-none shadow-sm px-4 py-3 flex flex-row'>
+                                <LuLoader className="animate-spin text-blue-600" size={20} />
+                                <p className='text-sm text-gray-500 ml-2'>Thinking...</p>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* Chat Input Area */}
