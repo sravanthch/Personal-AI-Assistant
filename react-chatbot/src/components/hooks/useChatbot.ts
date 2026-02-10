@@ -21,38 +21,37 @@ export const useChatbot = () => {
 
         // Temporarily hard-coded API key (move to .env later)
         // const apiKey = process.env.API_KEY
-        const apiKey = import.meta.env.VITE_API_KEY;
+        const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
         try {
             let userContent = message;
 
-            // If PDF is uploaded and context should be included, add it to the message
             if (includeContext && pdfContent) {
                 userContent = `You are answering based on the following PDF document content:\n\n${pdfContent}\n\nQuestion: ${message}`;
             }
 
             const response = await axios.post(
-                import.meta.env.VITE_OPEN_AI_API,
+                `${import.meta.env.VITE_GEMINI_API_URL}?key=${apiKey}`,
                 {
-                    model: "gpt-4o-mini",
-                    messages: [
+                    contents: [
                         {
-                            role: "user",
-                            content: userContent,
+                            parts: [
+                                {
+                                    text: userContent,
+                                },
+                            ],
                         },
                     ],
                 },
                 {
                     headers: {
-                        Authorization: `Bearer ${apiKey}`,
                         "Content-Type": "application/json",
                     },
                 }
             );
 
             const botMessage =
-                response?.data?.choices?.[0]?.message?.content ??
-                response?.data?.choices?.[0]?.text ??
+                response?.data?.candidates?.[0]?.content?.parts?.[0]?.text ??
                 "(no response)";
 
             setMessages((prev) => [...prev, { text: botMessage, sender: "bot" }]);
