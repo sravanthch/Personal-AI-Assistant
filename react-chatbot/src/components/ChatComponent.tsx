@@ -12,7 +12,7 @@ interface IChatComponentProps {
 const ChatComponent: React.FunctionComponent<IChatComponentProps> = () => {
     const [input, setInput] = useState('')
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const { messages, sendMessage, setPDF, clearPDF, hasPDF, isSending } = useChatbot();
+    const { messages, sendMessage, setPDF, clearPDF, clearChat, hasPDF, isSending } = useChatbot();
     const { pdfData, isLoading, error, uploadPDF, clearPDF: clearPDFHandler } = usePDFHandler();
     const ref = useChatScroll(messages)
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -151,8 +151,19 @@ const ChatComponent: React.FunctionComponent<IChatComponentProps> = () => {
                     )}
                 </div>
 
-                <div className='p-4 border-t border-gray-700 text-xs text-gray-400 text-center'>
-                    <p>Supported format: PDF</p>
+                <div className='p-4 border-t border-gray-700 flex flex-col gap-2'>
+                    {messages.length > 0 && (
+                        <button
+                            onClick={clearChat}
+                            className='w-full px-3 py-2 bg-gray-700 hover:bg-gray-600 text-white text-xs font-medium rounded transition duration-200 flex items-center justify-center gap-2 border border-gray-600'
+                        >
+                            <LuX size={14} />
+                            Clear Chat History
+                        </button>
+                    )}
+                    <div className='text-xs text-gray-400 text-center'>
+                        <p>Supported format: PDF</p>
+                    </div>
                 </div>
             </div>
 
@@ -166,7 +177,7 @@ const ChatComponent: React.FunctionComponent<IChatComponentProps> = () => {
                     </button>
                     <div className='flex items-center gap-2 justify-center flex-1'>
                         <LuBot size={25} />
-                        React + OpenAI Chatbot
+                        React + AI Chatbot
                     </div>
                 </div>
 
