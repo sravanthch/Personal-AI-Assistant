@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 64 64"
+     width="64"
+     height="64">
+
+  <!-- Scale everything up using transform -->
+  <g transform="scale(1.2) translate(-5,-5)">
+
+    <!-- PDF background -->
+    <rect x="6" y="6" width="52" height="52" rx="10" fill="#dc2626"/>
+
+    <!-- AI text large and centered -->
+    <text x="16"
+          y="42"
+          font-family="Arial, sans-serif"
+          font-size="28"
+          font-weight="bold"
+          fill="white">
+      AI
+    </text>
+
+  </g>
+
+</svg>
