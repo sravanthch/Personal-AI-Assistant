@@ -1,9 +1,11 @@
 import React, { useState, useRef } from 'react'
-import { LuBot, LuSendHorizontal, LuUpload, LuX, LuFileText, LuMenu, LuLoader } from 'react-icons/lu';
+import { LuBot, LuSendHorizontal, LuUpload, LuX, LuFileText, LuMenu, LuLoader, LuKey } from 'react-icons/lu';
 import { useChatbot } from './hooks/useChatbot';
 import Markdown from 'react-markdown';
 import { usePDFHandler } from './hooks/usePdfHandler';
 import useChatScroll from './hooks/useChatScroll';
+import ApiKeyModal from './ApiKeyModal';
+import RateLimitModal from './RateLimitModal';
 
 interface IChatComponentProps {
 
@@ -12,13 +14,32 @@ interface IChatComponentProps {
 const ChatComponent: React.FunctionComponent<IChatComponentProps> = () => {
     const [input, setInput] = useState('')
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const { messages, sendMessage, setPDF, clearPDF, clearChat, hasPDF, isSending } = useChatbot();
+    const [isApiKeyModalOpen, setIsApiKeyModalOpen] = useState(false);
+    const {
+        messages,
+        sendMessage,
+        setPDF,
+        clearPDF,
+        clearChat,
+        hasPDF,
+        isSending,
+        isRateLimited,
+        resetRateLimit,
+        isLimitReached,
+        userApiKey,
+        saveApiKey,
+        promptCount
+    } = useChatbot();
     const { pdfData, isLoading, error, uploadPDF, clearPDF: clearPDFHandler } = usePDFHandler();
     const ref = useChatScroll(messages)
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleSend = () => {
         if (input.trim()) {
+            if (isLimitReached) {
+                setIsApiKeyModalOpen(true);
+                return;
+            }
             sendMessage(input, hasPDF);
             setInput('')
         }
@@ -161,7 +182,8 @@ const ChatComponent: React.FunctionComponent<IChatComponentProps> = () => {
                             Clear Chat History
                         </button>
                     )}
-                    <div className='text-xs text-gray-400 text-center'>
+
+                    <div className='text-xs text-gray-400 text-center mt-2'>
                         <p>Supported format: PDF</p>
                     </div>
                 </div>
@@ -175,9 +197,36 @@ const ChatComponent: React.FunctionComponent<IChatComponentProps> = () => {
                     >
                         <LuMenu size={24} />
                     </button>
-                    <div className='flex items-center gap-2 justify-center flex-1'>
-                        <LuBot size={25} />
-                        React + AI Chatbot
+                    <div className='flex items-center gap-2 justify-center flex-1 min-w-0'>
+                        <LuBot size={25} className="flex-shrink-0" />
+                        <span className="truncate">React + AI Chatbot</span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                        {!userApiKey && (
+                            <div className="hidden sm:flex flex-col items-end mr-2">
+                                <span className="text-[10px] uppercase font-bold text-blue-200 leading-none mb-1">
+                                    {promptCount}/4
+                                </span>
+                                <div className="w-12 h-1 bg-white/20 rounded-full overflow-hidden">
+                                    <div
+                                        className={`h-full transition-all duration-500 ${promptCount >= 4 ? 'bg-red-400' : 'bg-green-400'}`}
+                                        style={{ width: `${Math.min((promptCount / 4) * 100, 100)}%` }}
+                                    />
+                                </div>
+                            </div>
+                        )}
+                        <button
+                            onClick={() => setIsApiKeyModalOpen(true)}
+                            className={`p-2 rounded-lg transition-all duration-200 flex items-center gap-2 ${userApiKey
+                                ? 'bg-green-500/20 text-green-300 border border-green-500/30'
+                                : 'bg-white/10 text-white hover:bg-white/20 border border-white/10 shadow-lg'
+                                }`}
+                            title={userApiKey ? 'API Key Active' : 'Enter API Key'}
+                        >
+                            <LuKey size={18} />
+                            {!userApiKey && <span className="text-xs hidden md:block">Upgrade</span>}
+                        </button>
                     </div>
                 </div>
 
@@ -244,6 +293,20 @@ const ChatComponent: React.FunctionComponent<IChatComponentProps> = () => {
                     </div>
                 </div>
             </div>
+
+            <ApiKeyModal
+                isOpen={isApiKeyModalOpen}
+                onClose={() => setIsApiKeyModalOpen(false)}
+                onSave={saveApiKey}
+                currentKey={userApiKey}
+            />
+
+            <RateLimitModal
+                isOpen={isRateLimited}
+                onClose={resetRateLimit}
+                onUpgrade={() => setIsApiKeyModalOpen(true)}
+                isUsingDemoKey={!userApiKey}
+            />
         </>
     )
 }
