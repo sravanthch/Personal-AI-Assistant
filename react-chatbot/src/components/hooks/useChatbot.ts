@@ -40,6 +40,7 @@ export const useChatbot = () => {
         const checkReset = () => {
             const currentDate = getTodayDateString();
             if (currentDate !== lastResetDate) {
+                console.log(`Date changed from ${lastResetDate} to ${currentDate}. Resetting prompt count.`);
                 setPromptCount(0);
                 setLastResetDate(currentDate);
                 localStorage.setItem("prompt_count", "0");
@@ -52,11 +53,15 @@ export const useChatbot = () => {
         return () => clearInterval(interval);
     }, [lastResetDate]);
 
-
     // Persist prompt count
     useEffect(() => {
         localStorage.setItem("prompt_count", promptCount.toString());
     }, [promptCount]);
+
+    // Persist last reset date
+    useEffect(() => {
+        localStorage.setItem("prompt_last_reset_date", lastResetDate);
+    }, [lastResetDate]);
 
     // Persist custom API key
     const saveApiKey = (key: string) => {
