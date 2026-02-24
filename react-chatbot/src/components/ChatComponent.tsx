@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react'
-import { LuBot, LuSendHorizontal, LuUpload, LuX, LuFileText, LuMenu, LuLoader, LuKey } from 'react-icons/lu';
+import { LuBot, LuSendHorizontal, LuUpload, LuX, LuFileText, LuMenu, LuLoader, LuKey, LuInfo } from 'react-icons/lu';
 import { useChatbot } from './hooks/useChatbot';
 import Markdown from 'react-markdown';
 import { usePDFHandler } from './hooks/usePdfHandler';
@@ -199,12 +199,12 @@ const ChatComponent: React.FunctionComponent<IChatComponentProps> = () => {
                     </button>
                     <div className='flex items-center gap-2 justify-center flex-1 min-w-0'>
                         <LuBot size={25} className="flex-shrink-0" />
-                        <span className="truncate">React + AI Chatbot</span>
+                        <span className="truncate">SmartDoc AI</span>
                     </div>
 
                     <div className="flex items-center gap-2">
                         {!userApiKey && (
-                            <div className="hidden sm:flex flex-col items-end mr-2">
+                            <div className="flex flex-col items-end mr-2">
                                 <span className="text-[10px] uppercase font-bold text-blue-200 leading-none mb-1">
                                     {promptCount}/4
                                 </span>
@@ -269,6 +269,20 @@ const ChatComponent: React.FunctionComponent<IChatComponentProps> = () => {
 
                 {/* Chat Input Area */}
                 <div className='p-4 border-t border-gray-200 bg-white'>
+                    {!userApiKey && (
+                        <div className="mb-3 px-3 py-2 bg-blue-50 border border-blue-100 rounded-lg flex items-center gap-2">
+                            <LuInfo size={14} className="text-blue-500 flex-shrink-0" />
+                            <p className="text-[11px] text-blue-700">
+                                <span className="font-semibold">{4 - promptCount}</span> free prompts remaining for today.
+                                <button
+                                    onClick={() => setIsApiKeyModalOpen(true)}
+                                    className="ml-1 font-bold underline hover:text-blue-800"
+                                >
+                                    Upgrade to Pro
+                                </button>
+                            </p>
+                        </div>
+                    )}
                     <div className='flex items-center gap-2'>
                         <input
                             type='text'
