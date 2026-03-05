@@ -199,7 +199,7 @@ const ChatComponent: React.FunctionComponent<IChatComponentProps> = () => {
                     </button>
                     <div className='flex items-center gap-2 justify-center flex-1 min-w-0'>
                         <LuBot size={25} className="flex-shrink-0" />
-                        <span className="truncate">SmartDoc AI</span>
+                        <span className="text-md">Doc - Talk</span>
                     </div>
 
                     <div className="flex items-center gap-2">
